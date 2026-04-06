@@ -1,0 +1,64 @@
+  <!-- Data source indicator -->
+  <div class="mode-bar">
+    <span
+      class="mode-badge"
+      [class.live]="stockService.dataMode() === 'live'"
+      [class.mock]="stockService.dataMode() === 'mock'"
+      [class.connecting]="stockService.dataMode() === 'connecting'"
+    >
+      <span class="mode-dot"></span>
+      @if (stockService.dataMode() === 'live') { Live Finnhub Data }
+      @else if (stockService.dataMode() === 'mock') { Mock Data }
+      @else { Connecting... }
+    </span>
+  </div>
+<div class="grid">
+  <!-- Cards -->
+  @for (stock of stockService.stocks(); track stock.symbol) {
+    <div
+      class="card"
+      [class.up]="stock.active && stockService.priceDirections()[stock.symbol] === 'up'"
+      [class.down]="stock.active && stockService.priceDirections()[stock.symbol] === 'down'"
+      [class.off]="!stock.active"
+    >
+      <div class="card-header">
+        <div>
+          <div class="symbol">{{ stock.symbol }}</div>
+          <div class="name">{{ stock.name }}</div>
+        </div>
+        <button class="toggle" (click)="stockService.toggleStock(stock.symbol)">
+          {{ stock.active ? 'ON' : 'OFF' }}
+        </button>
+      </div>
+
+      <div class="price">
+        {{ stock.price | currency }}
+        <span class="arrow">
+          @if (!stock.active) { — }
+          @else if (stockService.priceDirections()[stock.symbol] === 'up') { ▲ }
+          @else if (stockService.priceDirections()[stock.symbol] === 'down') { ▼ }
+          @else { — }
+        </span>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="label">Day High</span>
+          <span class="value">{{ stock.dailyHigh | currency }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Day Low</span>
+          <span class="value">{{ stock.dailyLow | currency }}</span>
+        </div>
+        <div class="stat desktop">
+          <span class="label">52W High</span>
+          <span class="value">{{ stock.weekHigh52 | currency }}</span>
+        </div>
+        <div class="stat desktop">
+          <span class="label">52W Low</span>
+          <span class="value">{{ stock.weekLow52 | currency }}</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>
